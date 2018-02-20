@@ -9,8 +9,11 @@ import {
 } from '@angular/core/testing';
 
 import {
-    DxButtonModule
+    DxButtonModule,
+    DxPopupModule
 } from '../../../dist';
+
+import * as windowUtils from 'devextreme/core/utils/window'
 
 @Component({
     selector: 'test-container-component',
@@ -22,11 +25,21 @@ class TestContainerComponent {
 describe('Universal', () => {
 
     beforeEach(() => {
-        TestBed.configureTestingModule(
-            {
-                declarations: [TestContainerComponent],
-                imports: [DxButtonModule]
-            });
+        TestBed.configureTestingModule({
+            declarations: [TestContainerComponent],
+            imports: [DxButtonModule, DxPopupModule]
+        });
+
+        windowUtils.hasWindow = function() {
+            return false;
+        };
+
+        var windowMock = {};
+        windowMock['window'] = windowMock;
+
+        windowUtils.getWindow = function() {
+            return windowMock;
+        };
     });
 
     // spec
@@ -41,4 +54,14 @@ describe('Universal', () => {
         expect(fixture.detectChanges.bind(fixture)).not.toThrow();
     });
 
+    it('should render popup', () => {
+        TestBed.overrideComponent(TestContainerComponent, {
+            set: {
+                template: `<dx-popup></dx-popup>`
+            }
+        });
+
+        let fixture = TestBed.createComponent(TestContainerComponent);
+        expect(fixture.detectChanges.bind(fixture)).not.toThrow();
+    });
 });
